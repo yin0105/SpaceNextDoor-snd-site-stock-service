@@ -1,0 +1,106 @@
+nodejs:
+  replicaCount: 1
+  nameOverride: staging-snd-site-stock-service
+  image:
+    repository: 414928843086.dkr.ecr.ap-southeast-1.amazonaws.com/snd-site-stock-service
+    pullPolicy: Always
+  containerPorts:
+    - 3000
+  env:
+    - name: NODE_ENV
+      value: staging
+    - name: HOST
+      value: 0.0.0.0
+    - name: PORT
+      value: 3000
+    - name: LOGGER_LEVEL
+      value: "error,log,warn,debug,verbose"
+    - name: DB_DIALECT
+      valueFrom:
+        secretKeyRef:
+          key: DB_DIALECT
+          name: core-api
+    - name: DB_PORT
+      valueFrom:
+        secretKeyRef:
+          key: DB_PORT
+          name: core-api
+    - name: DB_HOST
+      valueFrom:
+        secretKeyRef:
+          key: DB_HOST
+          name: core-api
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          key: DB_USERNAME
+          name: core-api
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: DB_PASSWORD
+          name: core-api
+    - name: DB_NAME
+      valueFrom:
+        secretKeyRef:
+          key: DB_NAME
+          name: core-api
+    - name: RDS_URL
+      valueFrom:
+        secretKeyRef:
+          name: site-stock-service
+          key: RDS_URL
+    - name: RABBITMQ_URL
+      valueFrom:
+        secretKeyRef:
+          name: site-stock-service
+          key: RABBITMQ_URL
+    - name: SND_EXCHANGE
+      valueFrom:
+        secretKeyRef:
+          name: site-stock-service
+          key: SND_EXCHANGE
+    - name: SND_UPDATE_ES_KEY
+      valueFrom:
+        secretKeyRef:
+          name: site-stock-service
+          key: SND_UPDATE_ES_KEY
+    - name: SND_UPDATE_ES_QUEUE
+      valueFrom:
+        secretKeyRef:
+          name: site-stock-service
+          key: SND_UPDATE_ES_QUEUE
+    - name: SND_UPDATE_STOCK_KEY
+      valueFrom:
+        secretKeyRef:
+          name: site-stock-service
+          key: SND_UPDATE_STOCK_KEY
+    - name: SND_UPDATE_STOCK_QUEUE
+      valueFrom:
+        secretKeyRef:
+          name: site-stock-service
+          key: SND_UPDATE_STOCK_QUEUE
+    - name: ES_SERVER_STR
+      valueFrom:
+        secretKeyRef:
+          name: site-stock-service
+          key: ES_SERVER_STR
+  workingDir: /var/source
+  resources:
+    limits:
+      cpu: 600m
+      memory: 600Mi
+    requests:
+      cpu: 200m
+      memory: 300Mi
+  healthCheck:
+    httpGet:
+      path: /health
+      port: 3000
+  type: ClusterIP
+  default:
+    ports:
+      - name: staging-snd-site-stock-service-http
+        externalPort: 80
+        internalPort: 3000
+        protocol: TCP
